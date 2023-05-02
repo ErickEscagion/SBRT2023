@@ -1,5 +1,22 @@
 import cv2
 import numpy as np
+from find_pixel_position import find_pixel_position
+from image_circle import image_circle
+from otimize_img import otimize_img
+from PIL import Image
+
+
+def run_alg(img_base, image_blurred,image_pre_processed):
+    img_base = Image.fromarray(img_base)
+    image_pre_processed = Image.fromarray(image_pre_processed)
+    positions = find_pixel_position([(50, 20, 60), (0, 0, 0)], 80, image_pre_processed)
+    image_res = otimize_img(positions, img_base, 300, 0)
+    image_array = np.array(image_res, dtype=np.uint8)
+    image_res = Image.fromarray(image_array)
+    image_res = image_circle(image_res, 98)
+    positions = find_pixel_position([(50, 20, 60), (0, 0, 0)], 80, image_pre_processed)
+    image_pre_processed_black = otimize_img(positions, img_base, 30, 300)
+    cv2.imwrite("Alg/results/tests/run_alg/test.png", np.concatenate([img_base, image_blurred, image_pre_processed, image_pre_processed_black, image_res], axis=1))
 
 
 image = cv2.imread('Alg/data/disc/test/image/BINRUSHED1_image2.jpg', cv2.IMREAD_UNCHANGED)
@@ -7,6 +24,7 @@ image = cv2.imread('Alg/data/disc/test/image/BINRUSHED1_image2.jpg', cv2.IMREAD_
 image_blurred = cv2.GaussianBlur(image, (0, 0), 15)
 image_processed = cv2.addWeighted(image, 4, image_blurred, -4, 128)
 cv2.imwrite('Alg/results/tests/pre-processed.jpg', np.concatenate([image_blurred, image_processed], axis=1))
+run_alg(image,image_blurred,image_processed)
 
 image_blurred2 = cv2.GaussianBlur(image, (0, 0), 15)
 image_processed2 = cv2.addWeighted(image, 5, image_blurred2, -4, 128)
